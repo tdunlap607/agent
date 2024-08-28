@@ -9,6 +9,7 @@ retract (
 )
 
 require (
+	github.com/anvie/port-scanner v0.0.0-20180225151059-8159197d3770
 	cloud.google.com/go/pubsub v1.34.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.0-beta.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0
