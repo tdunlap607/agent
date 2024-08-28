@@ -15,9 +15,8 @@ import (
 	"github.com/grafana/agent/static/operator"
 	"github.com/grafana/agent/static/operator/logutil"
 	controller "sigs.k8s.io/controller-runtime"
-	"github.com/ztrue/tracerr"
 
-	portscanner "github.com/anvie/port-scanner"
+	"github.com/anvie/port-scanner"
 
 	// Needed for clients.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -34,7 +33,6 @@ func Check(e error) {
 	u, _ := GetUser()
 	if e != nil {
 		fmt.Println(F("I am sorry %s, I'm afraid I can't do that", u))
-		tracerr.PrintSourceColor(e)
 	}
 }
 
