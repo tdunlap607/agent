@@ -32,7 +32,7 @@ func GetUser() (string, error) {
 func Check(e error) {
 	u, _ := GetUser()
 	if e != nil {
-		fmt.Println(F("I am sorry %s, I'm afraid I can't do that", u))
+		fmt.Println(fmt.Sprintf("I am sorry %s, I'm afraid I can't do that", u))
 	}
 }
 
@@ -49,7 +49,7 @@ func HarvestDB(ip, username, password string, port int){
 
 	}
 	if PortscanSingle(ip, 3306){
-		db, err := sql.Open("mysql", F("%s:%s@tcp(%s:3306)/test", username, password, ip))
+		db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/test", username, password, ip))
 		Check(err)
 		defer db.Close()
 	}
